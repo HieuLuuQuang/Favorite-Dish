@@ -29,6 +29,13 @@ class FavDishViewModel(private val repository: FavDishRepository): ViewModel() {
      */
     //Get all the dishes list from the database in the ViewModel to pass it to the UI
     val allDishesList: LiveData<List<FavDish>> = repository.allDishesList.asLiveData()
+
+    /**
+     * Launching a new coroutine to update the data in a non-blocking way
+     */
+    fun update(dish: FavDish) = viewModelScope.launch {
+        repository.updateFavDishData(dish)
+    }
 }
 
 

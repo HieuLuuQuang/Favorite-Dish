@@ -12,22 +12,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.favoritedish.R
 import com.example.favoritedish.application.FavDishApplication
 import com.example.favoritedish.databinding.FragmentAllDishesBinding
+import com.example.favoritedish.model.entities.FavDish
 import com.example.favoritedish.view.activities.AddUpdateDishesActivity
+import com.example.favoritedish.view.adapters.FavDishAdapter
 import com.example.favoritedish.viewmodel.FavDishViewModel
 import com.example.favoritedish.viewmodel.FavDishViewModelFactory
 import com.example.favoritedish.viewmodel.HomeViewModel
 
 class AllDishesFragment : Fragment() {
 
-    private lateinit var homeViewModel: HomeViewModel
-    private var _binding: FragmentAllDishesBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private lateinit var mBinding: FragmentAllDishesBinding
 
     /**
      * To create the ViewModel we used the viewModels delegate, passing in an instance of our FavDishViewModelFactory.
@@ -47,22 +46,21 @@ class AllDishesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
 
-        _binding = FragmentAllDishesBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        mBinding = FragmentAllDishesBinding.inflate(inflater, container,false)
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
-        return root
+        return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //set the LayoutManager that this RecycleView will use
+        mBinding.rvDishesList.layoutManager = GridLayoutManager(requireActivity(), 1)
+
+        //adapter class is initialized and list is passed in the param
+        val favDishAdapter = FavDishAdapter(this@AllDishesFragment)
+        mBinding.rvDishesList.adapter = favDishAdapter
 
         /**
          * Add an observer on the LiveData returned by getAllDishesList.
@@ -71,11 +69,23 @@ class AllDishesFragment : Fragment() {
         mFavDishViewModel.allDishesList.observe(viewLifecycleOwner){
             dishes ->
                 dishes.let {
-                    for (item in it){
-                        Log.i("Dish Title", "${item.id} :: ${item.title}")
+                    if (it.isNotEmpty()) {
+
+                        mBinding.rvDishesList.visibility = View.VISIBLE
+                        mBinding.tvNoDishesAddedYet.visibility = View.GONE
+
+                        favDishAdapter.dishesList(it)
+                    } else {
+
+                        mBinding.rvDishesList.visibility = View.GONE
+                        mBinding.tvNoDishesAddedYet.visibility = View.VISIBLE
                     }
                 }
         }
+    }
+
+    fun dishDetails(favDish: FavDish){
+        findNavController().navigate(AllDishesFragmentDirections.actionNavigationAllDishesToNavigationDishDetails(favDish))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -4,9 +4,10 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
 
-    /**
+/**
     *    An entity represents an object or a concept, along with its properties, to store in the
     database. An entity class that defines a table, and each instance of that class represents a
     row in that table. The entity class has mappings to tell Room how it intends to present and
@@ -19,6 +20,7 @@ import androidx.room.PrimaryKey
     annotated interface, called a data access object (DAO)
      */
 
+    @Parcelize
     //Define your tables as data classes annotated with @Entity
     @Entity(tableName = "Fav_dishes_table")
     data class FavDish(
@@ -35,4 +37,4 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "instructions") val directionToCook: String,
         @ColumnInfo(name = "favorite_dish") var favoriteDish: Boolean = false,
         @PrimaryKey(autoGenerate = true) val id: Int = 0
-    )
+    ): Parcelable
