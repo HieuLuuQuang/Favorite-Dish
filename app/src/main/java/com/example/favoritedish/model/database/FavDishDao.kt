@@ -48,5 +48,5 @@ interface FavDishDao {
     fun getAllDishesList(): Flow<List<FavDish>>
 
     @Update
-    fun updateFavDishDetails(favDish: FavDish)
+    suspend fun updateFavDishDetails(favDish: FavDish)
 }

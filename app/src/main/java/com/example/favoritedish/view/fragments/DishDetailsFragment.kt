@@ -47,6 +47,9 @@ class DishDetailsFragment : Fragment() {
 
         //Get the required arguments that we have passed through action
         val args: DishDetailsFragmentArgs by navArgs()
+//        Log.i("Dish Title", args.dishDetails.title)
+//        Log.i("Dish Type", args.dishDetails.type)
+//        Log.i("Dish Image", args.dishDetails.image)
         args.let {
             try {
                 Glide.with(requireActivity())
@@ -80,41 +83,39 @@ class DishDetailsFragment : Fragment() {
                     )
                 )
             }
+        }
+        mBinding!!.ivFavoriteDish.setOnClickListener {
+            args.dishDetails.favoriteDish = !args.dishDetails.favoriteDish  //return boolean
 
-            mBinding!!.ivFavoriteDish.setOnClickListener {
-                args.dishDetails.favoriteDish = !args.dishDetails.favoriteDish  //true to false, false to true
+            mFavDishViewModel.update(args.dishDetails)  //pass the updated values to ViewModel
 
-                mFavDishViewModel.update(args.dishDetails)  //pass the updated values to ViewModel
-
-                if (args.dishDetails.favoriteDish) {
-                    mBinding!!.ivFavoriteDish.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            requireActivity(),
-                            R.drawable.ic_favorite_selected
-                        )
-                    )
-
-                    Toast.makeText(
+            if (args.dishDetails.favoriteDish) {
+                mBinding!!.ivFavoriteDish.setImageDrawable(
+                    ContextCompat.getDrawable(
                         requireActivity(),
-                        resources.getString(R.string.msg_added_to_favorites),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    mBinding!!.ivFavoriteDish.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            requireActivity(),
-                            R.drawable.ic_favorite_unselected
-                        )
+                        R.drawable.ic_favorite_selected
                     )
+                )
 
-                    Toast.makeText(
+                Toast.makeText(
+                    requireActivity(),
+                    resources.getString(R.string.msg_added_to_favorites),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                mBinding!!.ivFavoriteDish.setImageDrawable(
+                    ContextCompat.getDrawable(
                         requireActivity(),
-                        resources.getString(R.string.msg_removed_from_favorite),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                        R.drawable.ic_favorite_unselected
+                    )
+                )
+
+                Toast.makeText(
+                    requireActivity(),
+                    resources.getString(R.string.msg_removed_from_favorite),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-
         }
     }
 
