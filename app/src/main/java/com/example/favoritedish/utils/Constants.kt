@@ -9,6 +9,33 @@ object Constants {
     const val DISH_IMAGE_SOURCE_LOCAL: String = "Local"
     const val DISH_IMAGE_SOURCE_ONLINE: String = "Online"
 
+    //for passing the DishDetails to AddUpdateDishActivity
+    const val EXTRA_DISH_DETAILS: String = "DishDetails"
+
+    const val ALL_ITEMS: String = "All"
+    const val FILTER_SELECTION: String = "FilterSelection"
+
+    //https://api.spoonacular.com/recipes/random?apiKey=ba990d639a0d4bd8966a51b0a63e9bd9&limitLicense=true&tags=vegetarian,%20dessert&number=1
+
+    const val BASE_URL = "https://api.spoonacular.com/"
+    const val API_ENDPOINT: String = "recipes/random"
+
+    //api key value from spoonacular console
+    const val API_KEY_VALUE: String = "ba990d639a0d4bd8966a51b0a63e9bd9"
+
+    //key params
+    const val API_KEY: String = "apiKey"
+    const val LIMIT_LICENSE: String = "limitLicense"
+    const val TAGS: String = "tags"
+    const val NUMBER: String = "number"
+
+    //Add the default values to the constants
+    // KEY PARAMS VALUES ==> YOU CAN CHANGE AS PER REQUIREMENT FROM HERE TO MAKE THE DIFFERENCE IN THE API RESPONSE
+    const val LIMIT_LICENSE_VALUE: Boolean = true
+    const val TAG_VALUE: String = "vegetarian, dessert"
+    const val NUMBER_VALUE: Int = 1     //random 1 dish
+
+
     fun dishType(): ArrayList<String>{
         val list = ArrayList<String>()
         list.add("breakfast")

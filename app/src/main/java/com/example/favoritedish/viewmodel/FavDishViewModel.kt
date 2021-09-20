@@ -36,6 +36,22 @@ class FavDishViewModel(private val repository: FavDishRepository): ViewModel() {
     fun update(dish: FavDish) = viewModelScope.launch {
         repository.updateFavDishData(dish)
     }
+
+    //Get the list of favorite dishes that can populate in the UI.
+    val favoriteDishes: LiveData<List<FavDish>> = repository.favoriteDishes.asLiveData()
+
+    /**
+     * Launching a new coroutine to delete the data in a non-blocking way.
+     */
+    fun delete(dish: FavDish) = viewModelScope.launch {
+        repository.deleteFavDishData(dish)
+    }
+
+    /**
+     * Get the filtered list of dishes based on the dish type selection.
+     * @param value - dish type selection
+     */
+    fun getFilteredList(value: String) : LiveData<List<FavDish>> = repository.filteredListDishes(value).asLiveData()
 }
 
 

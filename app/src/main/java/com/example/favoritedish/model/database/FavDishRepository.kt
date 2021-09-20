@@ -32,4 +32,16 @@ class FavDishRepository(private val favDishDao: FavDishDao) {
     suspend fun updateFavDishData(favDish: FavDish){
         favDishDao.updateFavDishDetails(favDish)
     }
+
+    //Get the list of favorite dishes from the DAO and pass it to the ViewModel.
+    val favoriteDishes: Flow<List<FavDish>> = favDishDao.getFavoriteDishesList()
+
+    @WorkerThread
+    suspend fun deleteFavDishData(favDish: FavDish){
+        favDishDao.deleteFavDishDetails(favDish)
+    }
+
+    //function get the filtered list of Dishes based on the selection
+    fun filteredListDishes(value: String): Flow<List<FavDish>> =
+        favDishDao.getFilterDishesLise(value)   //value: dish type selection
 }

@@ -1,9 +1,6 @@
 package com.example.favoritedish.model.database
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.example.favoritedish.model.entities.FavDish
 import kotlinx.coroutines.flow.Flow
 
@@ -49,4 +46,19 @@ interface FavDishDao {
 
     @Update
     suspend fun updateFavDishDetails(favDish: FavDish)
+
+    /**
+     * SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
+     */
+    @Query("SELECT * FROM FAV_DISHES_TABLE WHERE favorite_dish = 1")
+    fun getFavoriteDishesList(): Flow<List<FavDish>>
+
+    /**
+     * Delete favorite dish details from the local database using room
+     */
+    @Delete
+    suspend fun deleteFavDishDetails(favDish: FavDish)
+
+    @Query("SELECT * FROM FAV_DISHES_TABLE WHERE type = :filterType")   //use ':' because filtertype is String
+    fun getFilterDishesLise(filterType: String): Flow<List<FavDish>>
 }

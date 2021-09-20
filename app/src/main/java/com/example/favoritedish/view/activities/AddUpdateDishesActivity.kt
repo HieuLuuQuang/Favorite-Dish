@@ -61,6 +61,8 @@ class AddUpdateDishesActivity : AppCompatActivity(), View.OnClickListener { //Im
 
     private lateinit var mCustomListDialog: Dialog
 
+    private var mFavDishDetails: FavDish? = null
+
     /**
      * Create an instance of the ViewModel class so that we can access its methods in our View class
 
@@ -77,7 +79,33 @@ class AddUpdateDishesActivity : AppCompatActivity(), View.OnClickListener { //Im
         mBinding = ActivityAddUpdateDishesBinding.inflate(layoutInflater)
         setContentView(mBinding.root)
 
+        //Get the dish details from intent extra and initialize the mFavDishDetails variable
+        if(intent.hasExtra(Constants.EXTRA_DISH_DETAILS)){
+            mFavDishDetails = intent.getParcelableExtra(Constants.EXTRA_DISH_DETAILS)
+        }
+
         setupActionBar()
+
+        mFavDishDetails?.let {
+            if (it.id != 0){
+                mImagePath = it.image
+
+                //load the dish image in the iv
+                Glide.with(this@AddUpdateDishesActivity)
+                    .load(mImagePath)
+                    .centerCrop()
+                    .into(mBinding.ivDishImage)
+
+                mBinding.etTitle.setText(it.title)
+                mBinding.etType.setText(it.type)
+                mBinding.etCategory.setText(it.category)
+                mBinding.etIngredients.setText(it.ingredients)
+                mBinding.etCookingTime.setText(it.cookingTime)
+                mBinding.etDirectionToCook.setText(it.directionToCook)
+
+                mBinding.btnAddDish.text = resources.getString(R.string.lbl_update_dish)
+            }
+        }
 
         // Assign the click event to the image button.
         mBinding.ivAddDishImage.setOnClickListener(this@AddUpdateDishesActivity)
@@ -91,6 +119,17 @@ class AddUpdateDishesActivity : AppCompatActivity(), View.OnClickListener { //Im
 
     private fun setupActionBar() {
         setSupportActionBar(mBinding.toolbarAddDishActivity)
+
+        //Update the title accordingly "ADD" or "UPDATE"
+        if (mFavDishDetails != null && mFavDishDetails!!.id != 0){
+            supportActionBar?.let {
+                it.title = resources.getString(R.string.title_edit_dish)
+            }
+        } else{
+            supportActionBar?.let {
+                it.title = resources.getString(R.string.title_add_dish)
+            }
+        }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 //        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
@@ -199,6 +238,19 @@ class AddUpdateDishesActivity : AppCompatActivity(), View.OnClickListener { //Im
                         ).show()
                     }
                     else -> {
+                        //Update the data and pass the details to ViewModel to Insert or Update
+                        var dishID =0
+                        var imageSource = Constants.DISH_IMAGE_SOURCE_LOCAL
+                        var favoriteDish = false
+
+                        mFavDishDetails?.let {
+                            if(it.id != 0){
+                                dishID = it.id
+                                imageSource = it.imageSource
+                                favoriteDish = it.favoriteDish
+                            }
+                        }
+
                         val favDishDetails: FavDish = FavDish(
                             mImagePath,
                             Constants.DISH_IMAGE_SOURCE_LOCAL,
@@ -208,19 +260,34 @@ class AddUpdateDishesActivity : AppCompatActivity(), View.OnClickListener { //Im
                             ingredients,
                             cookingTimeInMinutes,
                             cookingDirection,
-                            false
+                            favoriteDish,
+                            dishID
                         )
 
-                        //pass the value to the ViewModelClass
-                        mFavDishViewModel.insert(favDishDetails)
+                        if (dishID == 0 ){
+                            //pass the value to the ViewModelClass
+                            mFavDishViewModel.insert(favDishDetails)
 
-                        Toast.makeText(
-                            this@AddUpdateDishesActivity,
-                            "You successfully added your favorite dish details.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                            Toast.makeText(
+                                this@AddUpdateDishesActivity,
+                                "You successfully added your favorite dish details.",
+                                Toast.LENGTH_LONG
+                            ).show()
 
-                        Log.e("Insertion", "Success")
+                            Log.e("Insertion", "Success")
+                        } else {
+                            mFavDishViewModel.update(favDishDetails)
+
+                            Toast.makeText(
+                                this@AddUpdateDishesActivity,
+                                "You successfully updated your favorite dish details.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            Log.e("Updating", "Success")
+                        }
+
+
                         finish()    //finish activity
                     }
                 }
@@ -452,7 +519,7 @@ class AddUpdateDishesActivity : AppCompatActivity(), View.OnClickListener { //Im
         binding.rvList.layoutManager = LinearLayoutManager(this@AddUpdateDishesActivity)
 
         //adapter class is initialized and list is passed in the param
-        val adapter = CustomListItemAdapter(this@AddUpdateDishesActivity, itemsList, selection)
+        val adapter = CustomListItemAdapter(this@AddUpdateDishesActivity, null, itemsList, selection)
 
         //adapter instance is set to the recycleview to inflate the items
         binding.rvList.adapter = adapter
